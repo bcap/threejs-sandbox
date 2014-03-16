@@ -1,0 +1,114 @@
+<html>
+    <head>
+        <title>My first Three.js app</title>
+        <style>
+            canvas {
+                width: 100%;
+                height: 100%
+            }
+
+            p {
+                width: 40%;
+            }
+
+            p input {
+                width: 90%;
+                float: right;
+            }
+
+            #canvas-container {
+                width: 100%;
+                height: 70%;
+            }
+
+        </style>
+
+        <script src="three.min.js" ></script>
+    </head>
+    <body>
+
+        <div>
+            <h2>position</h2>
+            <p>x<input type="range" id="posx" min="-50" max="50"></p>
+            <p>y<input type="range" id="posy" min="-50" max="50"></p>
+            <p>z<input type="range" id="posz" min="-50" max="50"></p>
+        </div>
+
+        <div>
+            <h2>rotation</h2>
+            <p>x<input type="range" id="rotx" min="-50" max="50"></p>
+            <p>y<input type="range" id="roty" min="-50" max="50"></p>
+            <p>z<input type="range" id="rotz" min="-50" max="50"></p>
+        </div>
+
+        <h2>canvas</h2>
+        <div id='canvas-container'></div>
+
+        <script>
+
+            var renderer;
+            var scene;
+            var camera;
+            var cube;
+
+            var init = function () {
+                containerElement = document.getElementById('canvas-container')
+                canvasWidth = containerElement.clientWidth
+                canvasHeight = containerElement.clientHeight
+
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(70, canvasWidth / canvasHeight, 0.1, 1000);
+
+                renderer = new THREE.WebGLRenderer();
+                renderer.setSize(canvasWidth, canvasHeight);
+                containerElement.appendChild(renderer.domElement);
+
+                function createCube() {
+                    var geometry = new THREE.CubeGeometry(2, 2, 2);
+                    var material = new THREE.MeshBasicMaterial({color: 0x808080});
+                    var wireframeMaterial = new THREE.MeshBasicMaterial({color: 0x404040, wireframe: true, transparent: true });
+                    var outlineMaterial = new THREE.MeshBasicMaterial({color: 0x202020, side: THREE.BackSide});
+
+                    var cube = THREE.SceneUtils.createMultiMaterialObject(geometry, [material, wireframeMaterial]);
+
+                    var outline = new THREE.Mesh(geometry, outlineMaterial);
+                    outline.scale.multiplyScalar(1.15)
+
+                    var darkMaterial = new THREE.MeshBasicMaterial( { color: 0xffffcc } );
+                    var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
+
+                    group = new THREE.Object3D();
+                    group.add(cube)
+                    group.add(outline)
+
+                    return group
+                }
+
+                cube = createCube()
+                scene.add(cube);
+
+                camera.position.z = 5;
+            }
+
+            var update = function () {
+
+                cube.position.x = document.getElementById('posx').value / 10;
+                cube.position.y = document.getElementById('posy').value / 10;
+                cube.position.z = document.getElementById('posz').value / 10;
+
+                cube.rotation.x += document.getElementById('rotx').value / 1000;
+                cube.rotation.y += document.getElementById('roty').value / 1000;
+                cube.rotation.z += document.getElementById('rotz').value / 1000;
+            }
+
+            var render = function () {
+                requestAnimationFrame(render);
+                update()
+                renderer.render(scene, camera);
+            };
+
+            init();
+            render();
+        </script>
+    </body>
+</html>
